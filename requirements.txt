@@ -1,0 +1,7 @@
+difflib
+termcolor
+tld
+requests
+dnspython
+queue
+psycopg2-binary
