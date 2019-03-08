@@ -16,7 +16,7 @@ from tld import get_fld
 from tld.utils import update_tld_names
 from termcolor import colored
 import threading
-is_py2 = sys.version[0] == "2"
+is_py2 = sys.version[0] == "2" #checks if python version used == 2 in order to properly handle import of Queue module depending on the version used.
 if is_py2:
     import Queue as queue
 else:
@@ -214,26 +214,26 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
     if domain_to_monitor:
         with open("domains.txt", "r+") as domains: #checking domain name isn't already monitored
             for line in domains:
-                if domain in line:
-                    print(colored("[!] The domain name {} is already being monitored.".format(domain), "red"))
+                if domain_to_monitor in line:
+                    print(colored("[!] The domain name {} is already being monitored.".format(domain_to_monitor), "red"))
                     sys.exit(1)
-            response = cert_database().lookup(domain)
+            response = cert_database().lookup(domain_to_monitor)
             if response:
-                with open("./output/" + domain.lower() + ".txt", "a") as subdomains:
+                with open("./output/" + domain_to_monitor.lower() + ".txt", "a") as subdomains: #saving a copy of current subdomains
                     for subdomain in response:
                         subdomains.write(subdomain + "\n")
                 with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
-                    domains.write(domain + '\n')
-                    print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain), "yellow"))
+                    domains.write(domain_to_monitor + '\n')
+                    print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
                 try: input = raw_input #fixes python 2.x and 3.x input keyword
                 except NameError: pass
-                choice = input(colored("[?] Do you wish list of subdomains found for {} [Y]es [N]o (default: [N])?  ".format(domain), "red")) #listing subdomains upon request
+                choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N])".format(domain_to_monitor), "red")) #listing subdomains upon request
                 if choice.upper() == "Y":
                     for subdomain in response:
                         unique_list.append(subdomain)
                     unique_list = list(set(unique_list))
                     for subdomain in unique_list:
-                        print(subdomain)
+                        print(colored(subdomain, "yellow"))
                 else:
                     sys.exit(1)
             else: pass
@@ -398,7 +398,7 @@ def multithreading(threads):
                 threads_list.append(t1)
                 threads_list.append(t2)
     else:
-        adding_new_domain()
+        adding_new_domain(domain_to_monitor)
 
     for t in threads_list:
         t.join()
