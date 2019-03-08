@@ -1,0 +1,2 @@
+# sublert
+Sublert is a security and reconnaissance tool which leverages certificate transparency for the sole purpose of monitoring new subdomains deployed by specific organizations and issued TLS/SSL certificate. The tool will be scheduled to run periodically at fixed times, dates, or intervals (Ideally each day) and newly identified subdomains will be sent to Slack workspace with a notification push. Furthermore, the tool will determine resolving subdomains.
