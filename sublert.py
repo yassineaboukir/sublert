@@ -61,7 +61,7 @@ def parse_args():
                             const="True")
         parser.add_argument('-l', '--logging',
                             dest = "logging",
-                            help = "Enable Slack error logging.",
+                            help = "Enable Slack-based error logging.",
                             required=False,
                             nargs='?',
                             const="True")
@@ -69,6 +69,11 @@ def parse_args():
                             dest = "listing",
                             help = "Listing the monitored domains.",
                             required =  False,
+                            nargs='?',
+                            const="True")
+        parser.add_argument('-m', '--reset',
+                            dest = "reset",
+                            help = "Reset everything.",
                             nargs='?',
                             const="True")
         return parser.parse_args()
@@ -103,6 +108,13 @@ def slack(data): #posting to Slack
         error = "Request to slack returned an error {}, the response is:\n{}".format(response.status_code, response.text)
         errorlog(errorlog, enable_logging)
     time.sleep(1) #bypass Slack rate limit when using free workpalce, remove this line if you've pro subscription
+
+def reset(do_reset):
+    if do_reset:
+        os.system("cd ./output/ && rm -f *.txt && cd .. && rm -f domains.txt && touch domains.txt")
+        print(colored("\n[!] Sublert was reset successfully. Please add new domains to monitor!", "red"))
+        sys.exit(1)
+    else: pass
 
 def remove_domain(domain_to_delete): #remove a domain from the monitored list
     new_list = []
@@ -156,7 +168,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
 
         try:
-            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=8, verify=False) #times out after 8 seconds waiting
+            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=20, verify=False) #times out after 8 seconds waiting
             if req.status_code == 200:
                 try:
                     content = req.content.decode('utf-8')
@@ -212,6 +224,9 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
     global domain_to_monitor
     global input
     if domain_to_monitor:
+        if not os.path.isfile('./domains.txt'): #check if domains.txt exist, if not create a new one
+            os.system("touch domains.txt")
+        else: pass
         with open("domains.txt", "r+") as domains: #checking domain name isn't already monitored
             for line in domains:
                 if domain_to_monitor in line:
@@ -227,7 +242,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
                 try: input = raw_input #fixes python 2.x and 3.x input keyword
                 except NameError: pass
-                choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N])".format(domain_to_monitor), "red")) #listing subdomains upon request
+                choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "red")) #listing subdomains upon request
                 if choice.upper() == "Y":
                     for subdomain in response:
                         unique_list.append(subdomain)
@@ -411,9 +426,11 @@ if __name__ == '__main__':
     list_domains = parse_args().listing
     domain_to_monitor = domain_sanity_check(parse_args().target)
     domain_to_delete = domain_sanity_check(parse_args().remove_domain)
+    do_reset = parse_args().reset
 
 #execute the various functions
     banner()
+    reset(do_reset)
     remove_domain(domain_to_delete)
     domains_listing()
     queuing()
