@@ -1,4 +1,3 @@
-difflib
 termcolor
 tld
 requests
