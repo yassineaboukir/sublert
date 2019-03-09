@@ -19,7 +19,7 @@ setup(
                       'dnspython',
                       'tld',
                       'termcolor',
-                      'Queue'],
+                     ],
     project_urls={
         'Documentation': 'http://github.com/yassineaboukir/sublert',
         'Roadmap': 'https://github.com/yassineaboukir/sublert/projects',
