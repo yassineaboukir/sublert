@@ -17,7 +17,7 @@ Sublert is a security and reconnaissance tool that was written in Python to leve
 
 ## Installation & Configuration
 Please refer to below article for a detailed technical explanation:
-- https://medium.com/@x0/automated-monitoring-of-subdomains-for-fun-and-profit-release-of-sublert-634cfc5d7708
+- https://medium.com/@yassineaboukir/automated-monitoring-of-subdomains-for-fun-and-profit-release-of-sublert-634cfc5d7708
 
 ## Usage
 
