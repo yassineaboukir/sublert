@@ -443,5 +443,4 @@ if __name__ == '__main__':
             dns_resolution(new_subdomains)
         else:
             posting_to_slack(new_subdomains, False, None)
-    else:
-        print(colored("\n[!] DNS resolution isn't supported when adding a new domain to the monitored list.", "red"))
+    else: pass
