@@ -23,9 +23,10 @@ else:
     import queue as queue
 from config import *
 import time
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 version = "1.0.0"
-requests.packages.urllib3.disable_warnings()
 
 def banner():
     print('''
