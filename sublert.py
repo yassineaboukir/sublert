@@ -23,10 +23,9 @@ else:
     import queue as queue
 from config import *
 import time
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 version = "1.0.0"
+requests.packages.urllib3.disable_warnings()
 
 def banner():
     print('''
@@ -51,12 +50,12 @@ def parse_args():
                             required = False)
         parser.add_argument('-t', '--threads',
                             dest = "threads",
-                            help = "Number concurrent threads to use. Default: 20",
+                            help = "Number of concurrent threads to use. Default: 20",
                             type = int,
                             default = 20)
         parser.add_argument('-r', '--resolve',
                             dest = "resolve",
-                            help = "Perform DNS resolution",
+                            help = "Perform DNS resolution.",
                             required=False,
                             nargs='?',
                             const="True")
@@ -68,7 +67,7 @@ def parse_args():
                             const="True")
         parser.add_argument('-a', '--list',
                             dest = "listing",
-                            help = "Listing the monitored domains.",
+                            help = "Listing all monitored domains.",
                             required =  False,
                             nargs='?',
                             const="True")
@@ -328,15 +327,15 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
                     dns_results[domain]["CNAME"] = cname_records
                 else: pass
         except dns.resolver.NXDOMAIN:
-            dns_results[domain]["A"] = eval('["No such domain"]')
+            dns_results[domain]["A"] = eval('["No such domain."]')
             pass
         except dns.resolver.Timeout:
-            dns_results[domain]["A"] = "Timed out while resolving"
-            dns_results[domain]["CNAME"] = "Timed out error while resolving"
+            dns_results[domain]["A"] = eval('["Timed out while resolving."]')
+            dns_results[domain]["CNAME"] = eval('["Timed out error while resolving."]')
             pass
         except dns.exception.DNSException:
-            dns_results[domain]["A"] = "There was an error while resolving."
-            dns_results[domain]["CNAME"] = "There was an error while resolving."
+            dns_results[domain]["A"] = eval('["There was an error while resolving."]')
+            dns_results[domain]["CNAME"] = eval('["There was an error while resolving."]')
             pass
     return posting_to_slack(None, True, dns_results)
 
