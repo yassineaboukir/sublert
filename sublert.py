@@ -229,7 +229,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
         else: pass
         with open("domains.txt", "r+") as domains: #checking domain name isn't already monitored
             for line in domains:
-                if domain_to_monitor.lower() == line.replace('\n', ''):
+                if domain_to_monitor == line.replace('\n', ''):
                     print(colored("[!] The domain name {} is already being monitored.".format(domain_to_monitor), "red"))
                     sys.exit(1)
             response = cert_database().lookup(domain_to_monitor)
