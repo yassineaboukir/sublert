@@ -229,7 +229,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
         else: pass
         with open("domains.txt", "r+") as domains: #checking domain name isn't already monitored
             for line in domains:
-                if domain_to_monitor == line:
+                if domain_to_monitor.lower() == line.replace('\n', ''):
                     print(colored("[!] The domain name {} is already being monitored.".format(domain_to_monitor), "red"))
                     sys.exit(1)
             response = cert_database().lookup(domain_to_monitor)
@@ -238,7 +238,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     for subdomain in response:
                         subdomains.write(subdomain + "\n")
                 with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
-                    domains.write(domain_to_monitor + '\n')
+                    domains.write(domain_to_monitor.lower() + '\n')
                     print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
                 try: input = raw_input #fixes python 2.x and 3.x input keyword
                 except NameError: pass
