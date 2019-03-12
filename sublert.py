@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 # Announced and released during OWASP Seasides 2019 & NullCon.
-# Huge shout out to the indian bug bounty community for their hospitality.
+# Huge shout out to the Indian bug bounty community for their hospitality.
 
 import argparse
 import dns.resolver
@@ -91,7 +91,7 @@ def domain_sanity_check(domain): #Verify the domain name sanity
             try:
                 domain = get_fld(domain)
             except:
-                print(colored("[!] Incorrect domain name. Please follow this format: example.com, https://example.com, www.example.com", "red"))
+                print(colored("[!] Incorrect domain format. Please follow this format: example.com, https://example.com, www.example.com", "red"))
                 sys.exit(1)
     else:
         pass
