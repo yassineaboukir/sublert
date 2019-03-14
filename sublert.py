@@ -110,7 +110,7 @@ def slack(data): #posting to Slack
     if slack_sleep_enabled:
         time.sleep(1)
 
-def reset(do_reset):
+def reset(do_reset): #clear the monitored list of domains and remove all locally stored files
     if do_reset:
         os.system("cd ./output/ && rm -f *.txt && cd .. && rm -f domains.txt && touch domains.txt")
         print(colored("\n[!] Sublert was reset successfully. Please add new domains to monitor!", "red"))
@@ -340,7 +340,7 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
             pass
     return posting_to_slack(None, True, dns_results)
 
-def at_channel():
+def at_channel(): #control slack @channel 
     return("<!channel> " if at_channel_enabled else "")
 
 def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack workplace
