@@ -350,7 +350,7 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
         dns_result = dns_output
         if dns_result:
             rev_url = []
-            print(colored("\n[!] Exporting result to Slack. Please don't interrupt!", "red"))
+            print(colored("\n[!] Exporting result to Slack. Please do not interrupt!", "red"))
             for url in dns_result:
                 url = url.replace('*.', '')
                 url = "https://" + url.replace('+ ', '')
