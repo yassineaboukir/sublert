@@ -340,6 +340,9 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
             pass
     return posting_to_slack(None, True, dns_results)
 
+def at_channel():
+    return("<!channel> " if at_channel_enabled else "")
+
 def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack workplace
     global domain_to_monitor
     global new_subdomains
@@ -355,7 +358,7 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
             for subdomain in new_subdomains:
                 subdomain = subdomain.replace('*.','')
                 subdomain = subdomain.replace('+ ','')
-                data = "<!channel> :new: {}".format(subdomain)
+                data = "{}:new: {}".format(at_channel(), subdomain)
                 slack(data)
                 try:
                     if dns_result[subdomain]["A"]:
@@ -382,7 +385,7 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
         for url in result:
             url = "https://" + url.replace('+ ', '')
             rev_url.append(get_fld(url))
-            data = "<!channel> :new: {}".format(url)
+            data = "{}:new: {}".format(at_channel(), url)
             slack(data)
         print(colored("\n[!] Done. ", "green"))
         rev_url = list(set(rev_url))
@@ -394,7 +397,7 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
 
     else:
         if not domain_to_monitor:
-            data = "<!channel> :-1: We couldn't find any new subdomains."
+            data = "{}:-1: We couldn't find any new subdomains.".format(at_channel())
             slack(data)
             print(colored("\n[!] Done. ", "green"))
             os.system("rm -f ./output/*_tmp.txt")
