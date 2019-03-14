@@ -155,7 +155,7 @@ def errorlog(error, enable_logging): #log errors and post them to slack channel
                                 )
         if response.status_code != 200:
             error = "Request to slack returned an error {}, the response is:\n{}".format(response.status_code, response.text)
-            errorlog(errorlog, enable_logging)
+            errorlog(error, enable_logging)
     else: pass
 
 class cert_database(object): #Connecting to crt.sh public API to retrieve subdomains
