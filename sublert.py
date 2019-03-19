@@ -80,19 +80,12 @@ def parse_args():
 
 def domain_sanity_check(domain): #Verify the domain name sanity
     if domain:
-        if ("http://" or "https://") not in domain:
-            try:
-                domain = get_fld("https://" + domain)
-                return domain
-            except:
-                print(colored("[!] Incorrect domain format. Please follow this format: example.com, https://example.com, www.example.com", "red"))
-                sys.exit(1)
-        else:
-            try:
-                domain = get_fld(domain)
-            except:
-                print(colored("[!] Incorrect domain format. Please follow this format: example.com, https://example.com, www.example.com", "red"))
-                sys.exit(1)
+        try:
+            domain = get_fld(domain, fix_protocol = True)
+            return domain
+        except:
+            print(colored("[!] Incorrect domain format. Please follow this format: example.com, http(s)://example.com, www.example.com", "red"))
+            sys.exit(1)
     else:
         pass
 
@@ -234,25 +227,26 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     print(colored("[!] The domain name {} is already being monitored.".format(domain_to_monitor), "red"))
                     sys.exit(1)
             response = cert_database().lookup(domain_to_monitor)
-            if response:
-                with open("./output/" + domain_to_monitor.lower() + ".txt", "a") as subdomains: #saving a copy of current subdomains
-                    for subdomain in response:
-                        subdomains.write(subdomain + "\n")
-                with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
-                    domains.write(domain_to_monitor.lower() + '\n')
-                    print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
-                try: input = raw_input #fixes python 2.x and 3.x input keyword
-                except NameError: pass
-                choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "red")) #listing subdomains upon request
-                if choice.upper() == "Y":
+            with open("./output/" + domain_to_monitor.lower() + ".txt", "a") as subdomains: #saving a copy of current subdomains
+                for subdomain in response:
+                    subdomains.write(subdomain + "\n")
+            with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
+                domains.write(domain_to_monitor.lower() + '\n')
+                print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
+            try: input = raw_input #fixes python 2.x and 3.x input keyword
+            except NameError: pass
+            choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
+            if choice.upper() == "Y":
+                if response:
                     for subdomain in response:
                         unique_list.append(subdomain)
                     unique_list = list(set(unique_list))
                     for subdomain in unique_list:
                         print(colored(subdomain, "yellow"))
                 else:
-                    sys.exit(1)
-            else: pass
+                    print(colored("\n[!] Unfortunately, we couldn't find any subdomain for {}".format(domain_to_monitor), "red"))
+            else:
+                sys.exit(1)
     else: #checks if a domain is monitored but has no text file saved in ./output
                 try:
                     line = q1.get(timeout=10)
@@ -340,7 +334,7 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
             pass
     return posting_to_slack(None, True, dns_results)
 
-def at_channel(): #control slack @channel 
+def at_channel(): #control slack @channel
     return("<!channel> " if at_channel_enabled else "")
 
 def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack workplace
