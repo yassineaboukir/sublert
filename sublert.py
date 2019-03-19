@@ -106,7 +106,7 @@ def slack(data): #posting to Slack
                             )
     if response.status_code != 200:
         error = "Request to slack returned an error {}, the response is:\n{}".format(response.status_code, response.text)
-        errorlog(errorlog, enable_logging)
+        errorlog(error, enable_logging)
     if slack_sleep_enabled:
         time.sleep(1)
 
