@@ -165,7 +165,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
         if wildcard:
             domain = "%25.{}".format(domain)
             url = base_url.format(domain)
-        subdomains = []
+        subdomains = set()
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
 
         try:
@@ -175,14 +175,14 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                     content = req.content.decode('utf-8')
                     data = json.loads(content)
                     for subdomain in data:
-                        subdomains.append(subdomain["name_value"])
-                    return subdomains
+                        subdomains.add(subdomain["name_value"])
+                    return sorted(subdomains)
                 except:
                     error = "Error retrieving information for {}.".format(domain.replace('%25.', ''))
                     errorlog(error, enable_logging)
         except:
             try: #connecting to crt.sh postgres database to retrieve subdomains in case API fails
-                unique_domains = []
+                unique_domains = set()
                 domain = domain.replace('%25.', '')
                 conn = psycopg2.connect("dbname={0} user={1} host={2}".format(DB_NAME, DB_USER, DB_HOST))
                 conn.autocommit = True
@@ -193,9 +193,9 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                     for subdomain in matches:
                         try:
                             if get_fld("https://" + subdomain) == domain:
-                                unique_domains.append(subdomain)
+                                unique_domains.add(subdomain)
                         except: pass
-                return unique_domains
+                return sorted(unique_domains)
             except:
                 print(colored("[!] Unable to connect to the database.".format(domain), "red"))
                 error = "Unable to connect to the database."
