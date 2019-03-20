@@ -81,10 +81,10 @@ def parse_args():
 def domain_sanity_check(domain): #Verify the domain name sanity
     if domain:
         try:
-            domain = get_fld(domain, fix_protocol = True)
+            domain = get_fld(domain, fix_protocol=True)
             return domain
         except:
-            print(colored("[!] Incorrect domain format. Please follow this format: example.com, http(s)://example.com, www.example.com", "red"))
+            print(colored("[!] Incorrect domain format. Please follow this format: example.com, https://example.com, www.example.com", "red"))
             sys.exit(1)
     else:
         pass
@@ -322,7 +322,7 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
                     dns_results[domain]["CNAME"] = cname_records
                 else: pass
         except dns.resolver.NXDOMAIN:
-            dns_results[domain]["A"] = eval('["No such domain."]')
+            del dns_results[domain] #remove the subdomain from the exported result since it's not resolving
             pass
         except dns.resolver.Timeout:
             dns_results[domain]["A"] = eval('["Timed out while resolving."]')
@@ -332,7 +332,10 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
             dns_results[domain]["A"] = eval('["There was an error while resolving."]')
             dns_results[domain]["CNAME"] = eval('["There was an error while resolving."]')
             pass
-    return posting_to_slack(None, True, dns_results)
+    if dns_results:
+        return posting_to_slack(None, True, dns_results) #Slack new subdomains with DNS ouput
+    else:
+        return posting_to_slack(None, False, None) #Nothing found notification
 
 def at_channel(): #control slack @channel
     return("<!channel> " if at_channel_enabled else "")
