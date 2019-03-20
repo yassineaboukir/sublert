@@ -81,10 +81,10 @@ def parse_args():
 def domain_sanity_check(domain): #Verify the domain name sanity
     if domain:
         try:
-            domain = get_fld(domain, fix_protocol=True)
+            domain = get_fld(domain, fix_protocol = True)
             return domain
         except:
-            print(colored("[!] Incorrect domain format. Please follow this format: example.com, https://example.com, www.example.com", "red"))
+            print(colored("[!] Incorrect domain format. Please follow this format: example.com, http(s)://example.com, www.example.com", "red"))
             sys.exit(1)
     else:
         pass
@@ -168,7 +168,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                     content = req.content.decode('utf-8')
                     data = json.loads(content)
                     for subdomain in data:
-                        subdomains.add(subdomain["name_value"])
+                        subdomains.add(subdomain["name_value"].lower())
                     return sorted(subdomains)
                 except:
                     error = "Error retrieving information for {}.".format(domain.replace('%25.', ''))
@@ -186,7 +186,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                     for subdomain in matches:
                         try:
                             if get_fld("https://" + subdomain) == domain:
-                                unique_domains.add(subdomain)
+                                unique_domains.add(subdomain.lower())
                         except: pass
                 return sorted(unique_domains)
             except:
@@ -394,7 +394,7 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
 
     else:
         if not domain_to_monitor:
-            data = "{}:-1: We couldn't find any new subdomains.".format(at_channel())
+            data = "{}:-1: We couldn't find any new valid subdomains.".format(at_channel())
             slack(data)
             print(colored("\n[!] Done. ", "green"))
             os.system("rm -f ./output/*_tmp.txt")
