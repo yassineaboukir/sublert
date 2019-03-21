@@ -154,26 +154,7 @@ def errorlog(error, enable_logging): #log errors and post them to slack channel
 class cert_database(object): #Connecting to crt.sh public API to retrieve subdomains
     global enable_logging
     def lookup(self, domain, wildcard = True):
-        base_url = "https://crt.sh/?q={}&output=json"
-        if wildcard:
-            domain = "%25.{}".format(domain)
-            url = base_url.format(domain)
-        subdomains = set()
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
-
         try:
-            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=20, verify=False) #times out after 8 seconds waiting
-            if req.status_code == 200:
-                try:
-                    content = req.content.decode('utf-8')
-                    data = json.loads(content)
-                    for subdomain in data:
-                        subdomains.add(subdomain["name_value"].lower())
-                    return sorted(subdomains)
-                except:
-                    error = "Error retrieving information for {}.".format(domain.replace('%25.', ''))
-                    errorlog(error, enable_logging)
-        except:
             try: #connecting to crt.sh postgres database to retrieve subdomains in case API fails
                 unique_domains = set()
                 domain = domain.replace('%25.', '')
@@ -190,9 +171,26 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                         except: pass
                 return sorted(unique_domains)
             except:
-                print(colored("[!] Unable to connect to the database.".format(domain), "red"))
                 error = "Unable to connect to the database."
                 errorlog(error, enable_logging)
+        except:
+            base_url = "https://crt.sh/?q={}&output=json"
+            if wildcard:
+                domain = "%25.{}".format(domain)
+                url = base_url.format(domain)
+            subdomains = set()
+            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
+            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=30, verify=False) #times out after 8 seconds waiting
+            if req.status_code == 200:
+                try:
+                    content = req.content.decode('utf-8')
+                    data = json.loads(content)
+                    for subdomain in data:
+                        subdomains.add(subdomain["name_value"].lower())
+                    return sorted(subdomains)
+                except:
+                    error = "Error retrieving information for {}.".format(domain.replace('%25.', ''))
+                    errorlog(error, enable_logging)
 
 def queuing(): #using the queue for multithreading purposes
     global domain_to_monitor
@@ -293,7 +291,10 @@ def compare_files_diff(domain_to_monitor): #compares the temporary text file wit
                         changes = [l for l in diff if l.startswith('+ ')] #check if there are new items/subdomains
                         newdiff = []
                         for c in changes:
-                            result.append(c.replace('\n', ''))
+                            c = c.replace('+ ', '')
+                            c = c.replace('*.', '')
+                            c = c.replace('\n', '')
+                            result.append(c)
                             result = list(set(result)) #remove duplicates
                     except:
                         error = "There was an error opening one of the files: {} or {}".format(domain_to_monitor + '.txt', domain_to_monitor + '_tmp.txt')
@@ -311,7 +312,7 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
         dns_results[domain] = {}
         try:
             for qtype in ['A','CNAME']:
-                dns_output = dns.resolver.query(domain,qtype, raise_on_no_answer=False)
+                dns_output = dns.resolver.query(domain,qtype, raise_on_no_answer = False)
                 if dns_output.rrset is None:
                     pass
                 elif dns_output.rdtype == 1:
@@ -322,7 +323,6 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
                     dns_results[domain]["CNAME"] = cname_records
                 else: pass
         except dns.resolver.NXDOMAIN:
-            del dns_results[domain] #remove the subdomain from the exported result since it's not resolving
             pass
         except dns.resolver.Timeout:
             dns_results[domain]["A"] = eval('["Timed out while resolving."]')
@@ -346,15 +346,17 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
     if dns_resolve:
         dns_result = dns_output
         if dns_result:
+            dns_result = {k:v for k,v in dns_result.items() if v} #filters non-resolving subdomains
             rev_url = []
             print(colored("\n[!] Exporting result to Slack. Please do not interrupt!", "red"))
             for url in dns_result:
                 url = url.replace('*.', '')
-                url = "https://" + url.replace('+ ', '')
-                rev_url.append(get_fld(url))
-            for subdomain in new_subdomains:
-                subdomain = subdomain.replace('*.','')
-                subdomain = subdomain.replace('+ ','')
+                url = url.replace('+ ', '')
+                rev_url.append(get_fld(url, fix_protocol = True))
+
+            unique_list = list(set(new_subdomains) & set(dns_result.keys())) #filters non-resolving subdomains from new_subdomains list
+
+            for subdomain in unique_list:
                 data = "{}:new: {}".format(at_channel(), subdomain)
                 slack(data)
                 try:
