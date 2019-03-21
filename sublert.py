@@ -180,7 +180,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                 url = base_url.format(domain)
             subdomains = set()
             user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
-            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=30, verify=False) #times out after 8 seconds waiting
+            req = requests.get(url, headers={'User-Agent': user_agent}, timeout=20, verify=False) #times out after 8 seconds waiting
             if req.status_code == 200:
                 try:
                     content = req.content.decode('utf-8')
