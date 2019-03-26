@@ -24,7 +24,7 @@ else:
 from config import *
 import time
 
-version = "1.0.0"
+version = "1.4.7"
 requests.packages.urllib3.disable_warnings()
 
 def banner():
