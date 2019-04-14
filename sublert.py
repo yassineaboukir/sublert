@@ -155,7 +155,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
     global enable_logging
     def lookup(self, domain, wildcard = True):
         try:
-            try: #connecting to crt.sh postgres database to retrieve subdomains in case API fails
+            try: #connecting to crt.sh postgres database to retrieve subdomains.
                 unique_domains = set()
                 domain = domain.replace('%25.', '')
                 conn = psycopg2.connect("dbname={0} user={1} host={2}".format(DB_NAME, DB_USER, DB_HOST))
@@ -171,7 +171,7 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
                         except: pass
                 return sorted(unique_domains)
             except:
-                error = "Unable to connect to the database."
+                error = "Unable to connect to the database. We will attempt to use the API instead."
                 errorlog(error, enable_logging)
         except:
             base_url = "https://crt.sh/?q={}&output=json"
