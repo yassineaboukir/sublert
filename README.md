@@ -31,11 +31,9 @@ Short Form    | Long Form     | Description
 -l            | --logging     | Enable Slack-based error logging.
 -m            | --reset        | Reset everything.
 
-## Is there a roadmap?
-YES! The tool is now open sourced to be used by the community but contributions are valuable and highly appreciated. I have a number of items that I will be working on to polish the tool, among of which are:
-- Use of a relational database instead of text files for storage.
-- Extracting as much information as possible including: title, status code, screenshot and checking for potential subdomain takeovers.
-- Integrate Telegram too for notification pushes.
-
 ## Feedback and issues?
 If you have any feedback, anything that you want to see implemented or running into issues using Sublert, please feel free to file an issue on https://github.com/yassineaboukir/sublert/issues
+
+## Support
+If you appreciate my work and wish to support it, feel free to: <a href="http://buymeacoffee.com/yassineaboukir"><img src="https://cdn-images-1.medium.com/max/738/1*G95uyokAH4JC5Ppvx4LmoQ@2x.png" width="150"></a>
+
