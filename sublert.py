@@ -50,7 +50,7 @@ def parse_args():
                             required = False)
         parser.add_argument('-t', '--threads',
                             dest = "threads",
-                            help = "Number of concurrent threads to use. Default: 20",
+                            help = "Number of concurrent threads to use. Default: 10",
                             type = int,
                             default = 20)
         parser.add_argument('-r', '--resolve',
