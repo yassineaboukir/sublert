@@ -52,7 +52,7 @@ def parse_args():
                             dest = "threads",
                             help = "Number of concurrent threads to use. Default: 10",
                             type = int,
-                            default = 20)
+                            default = 10)
         parser.add_argument('-r', '--resolve',
                             dest = "resolve",
                             help = "Perform DNS resolution.",
