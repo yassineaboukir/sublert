@@ -14,7 +14,7 @@ Sublert is a security and reconnaissance tool that was written in Python to leve
 ## Requirements
 - Virtual Private Server (VPS) running on Unix. (I personally use digitalOcean)
 - Python 2.x or 3.x.
-- Free Slack workplace.
+- Free Slack workspace.
 
 ## Installation & Configuration
 Please refer to below article for a detailed technical explanation:
