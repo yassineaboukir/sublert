@@ -44,6 +44,10 @@ def parse_args():
                             dest = "target",
                             help = "Domain to monitor. E.g: yahoo.com",
                             required = False)
+        parser.add_argument("-q", "--question", 
+                            type=str2bool, nargs='?', 
+                            const=True, default=True,
+                            help="Disable user input questions")
         parser.add_argument('-d', '--delete',
                             dest = "remove_domain",
                             help = "Domain to remove from the monitored list. E.g: yahoo.com",
@@ -233,6 +237,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                 print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
             try: input = raw_input #fixes python 2.x and 3.x input keyword
             except NameError: pass
+            if not question: sys.exit(1)
             choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
             if choice.upper() == "Y":
                 if response:
@@ -421,6 +426,16 @@ def multithreading(threads):
     for t in threads_list:
         t.join()
 
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 if __name__ == '__main__':
 
 #parse arguments
@@ -428,6 +443,7 @@ if __name__ == '__main__':
     enable_logging = parse_args().logging
     list_domains = parse_args().listing
     domain_to_monitor = domain_sanity_check(parse_args().target)
+    question = parse_args().question
     domain_to_delete = domain_sanity_check(parse_args().remove_domain)
     do_reset = parse_args().reset
 
@@ -447,3 +463,4 @@ if __name__ == '__main__':
         else:
             posting_to_slack(new_subdomains, False, None)
     else: pass
+
