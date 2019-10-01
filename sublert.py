@@ -45,7 +45,7 @@ def parse_args():
                             help = "Domain to monitor. E.g: yahoo.com",
                             required = False)
         parser.add_argument("-q", "--question", 
-                            type=str2bool, nargs='?', 
+                            type=string_to_bool, nargs='?', 
                             const=True, default=True,
                             help="Disable user input questions")
         parser.add_argument('-d', '--delete',
@@ -426,7 +426,7 @@ def multithreading(threads):
     for t in threads_list:
         t.join()
 
-def str2bool(v):
+def string_to_bool(v):
     if isinstance(v, bool):
        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
