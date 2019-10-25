@@ -44,8 +44,8 @@ def parse_args():
                             dest = "target",
                             help = "Domain to monitor. E.g: yahoo.com",
                             required = False)
-        parser.add_argument("-q", "--question", 
-                            type=string_to_bool, nargs='?', 
+        parser.add_argument("-q", "--question",
+                            type=string_to_bool, nargs='?',
                             const=True, default=True,
                             help="Disable user input questions")
         parser.add_argument('-d', '--delete',
@@ -159,24 +159,21 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
     global enable_logging
     def lookup(self, domain, wildcard = True):
         try:
-            try: #connecting to crt.sh postgres database to retrieve subdomains.
-                unique_domains = set()
-                domain = domain.replace('%25.', '')
-                conn = psycopg2.connect("dbname={0} user={1} host={2}".format(DB_NAME, DB_USER, DB_HOST))
-                conn.autocommit = True
-                cursor = conn.cursor()
-                cursor.execute("SELECT ci.NAME_VALUE NAME_VALUE FROM certificate_identity ci WHERE ci.NAME_TYPE = 'dNSName' AND reverse(lower(ci.NAME_VALUE)) LIKE reverse(lower('%{}'));".format(domain))
-                for result in cursor.fetchall():
-                    matches = re.findall(r"\'(.+?)\'", str(result))
-                    for subdomain in matches:
-                        try:
-                            if get_fld("https://" + subdomain) == domain:
-                                unique_domains.add(subdomain.lower())
-                        except: pass
-                return sorted(unique_domains)
-            except:
-                error = "Unable to connect to the database. We will attempt to use the API instead."
-                errorlog(error, enable_logging)
+            #connecting to crt.sh postgres database to retrieve subdomains.
+            unique_domains = set()
+            domain = domain.replace('%25.', '')
+            conn = psycopg2.connect("dbname={0} user={1} host={2}".format(DB_NAME, DB_USER, DB_HOST))
+            conn.autocommit = True
+            cursor = conn.cursor()
+            cursor.execute("SELECT ci.NAME_VALUE NAME_VALUE FROM certificate_identity ci WHERE ci.NAME_TYPE = 'dNSName' AND reverse(lower(ci.NAME_VALUE)) LIKE reverse(lower('%{}'));".format(domain))
+            for result in cursor.fetchall():
+                matches = re.findall(r"\'(.+?)\'", str(result))
+                for subdomain in matches:
+                    try:
+                        if get_fld("https://" + subdomain) == domain:
+                            unique_domains.add(subdomain.lower())
+                    except: pass
+            return sorted(unique_domains)
         except:
             base_url = "https://crt.sh/?q={}&output=json"
             if wildcard:
@@ -186,15 +183,11 @@ class cert_database(object): #Connecting to crt.sh public API to retrieve subdom
             user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:64.0) Gecko/20100101 Firefox/64.0'
             req = requests.get(url, headers={'User-Agent': user_agent}, timeout=20, verify=False) #times out after 8 seconds waiting
             if req.status_code == 200:
-                try:
-                    content = req.content.decode('utf-8')
-                    data = json.loads(content)
-                    for subdomain in data:
-                        subdomains.add(subdomain["name_value"].lower())
-                    return sorted(subdomains)
-                except:
-                    error = "Error retrieving information for {}.".format(domain.replace('%25.', ''))
-                    errorlog(error, enable_logging)
+                content = req.content.decode('utf-8')
+                data = json.loads(content)
+                for subdomain in data:
+                    subdomains.add(subdomain["name_value"].lower())
+                return sorted(subdomains)
 
 def queuing(): #using the queue for multithreading purposes
     global domain_to_monitor
@@ -238,7 +231,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
                 try: input = raw_input #fixes python 2.x and 3.x input keyword
                 except NameError: pass
-                if not question: sys.exit(1)
+                if question: sys.exit(1)
                 choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
                 if choice.upper() == "Y":
                         for subdomain in response:
@@ -462,4 +455,3 @@ if __name__ == '__main__':
         else:
             posting_to_slack(new_subdomains, False, None)
     else: pass
-
