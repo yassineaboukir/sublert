@@ -31,6 +31,7 @@ Short Form    | Long Form     | Description
 -r            | --resolve      | Perform DNS resolution.
 -l            | --logging     | Enable Slack-based error logging.
 -m            | --reset        | Reset everything.
+-q            | --question        | Disable questions asking for input. Available options: yes, true or no, false (Default: no)
 
 ## Feedback and issues?
 If you have any feedback, anything that you want to see implemented or running into issues using Sublert, please feel free to file an issue on https://github.com/yassineaboukir/sublert/issues
