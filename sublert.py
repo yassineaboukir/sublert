@@ -225,25 +225,24 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     print(colored("[!] The domain name {} is already being monitored.".format(domain_to_monitor), "red"))
                     sys.exit(1)
             response = cert_database().lookup(domain_to_monitor)
-            with open("./output/" + domain_to_monitor.lower() + ".txt", "a") as subdomains: #saving a copy of current subdomains
-                for subdomain in response:
-                    subdomains.write(subdomain + "\n")
-            with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
-                domains.write(domain_to_monitor.lower() + '\n')
-                print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
-            try: input = raw_input #fixes python 2.x and 3.x input keyword
-            except NameError: pass
-            choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
-            if choice.upper() == "Y":
-                if response:
+            if response:
+                with open("./output/" + domain_to_monitor.lower() + ".txt", "a") as subdomains: #saving a copy of current subdomains
                     for subdomain in response:
-                        unique_list.append(subdomain)
-                    unique_list = list(set(unique_list))
-                    for subdomain in unique_list:
-                        print(colored(subdomain, "yellow"))
-                else:
-                    print(colored("\n[!] Unfortunately, we couldn't find any subdomain for {}".format(domain_to_monitor), "red"))
+                        subdomains.write(subdomain + "\n")
+                with open("domains.txt", "a") as domains: #fetching subdomains if not monitored
+                    domains.write(domain_to_monitor.lower() + '\n')
+                    print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
+                try: input = raw_input #fixes python 2.x and 3.x input keyword
+                except NameError: pass
+                choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
+                if choice.upper() == "Y":
+                        for subdomain in response:
+                            unique_list.append(subdomain)
+                        unique_list = list(set(unique_list))
+                        for subdomain in unique_list:
+                            print(colored(subdomain, "yellow"))
             else:
+                print(colored("\n[!] Unfortunately, we couldn't find any subdomain for {}".format(domain_to_monitor), "red"))
                 sys.exit(1)
     else: #checks if a domain is monitored but has no text file saved in ./output
                 try:
