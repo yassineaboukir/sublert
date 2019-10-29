@@ -231,7 +231,7 @@ def adding_new_domain(q1): #adds a new domain to the monitoring list
                     print(colored("\n[+] Adding {} to the monitored list of domains.\n".format(domain_to_monitor), "yellow"))
                 try: input = raw_input #fixes python 2.x and 3.x input keyword
                 except NameError: pass
-                if question: sys.exit(1)
+                if not question: sys.exit(1)
                 choice = input(colored("[?] Do you wish to list subdomains found for {}? [Y]es [N]o (default: [N]) ".format(domain_to_monitor), "yellow")) #listing subdomains upon request
                 if choice.upper() == "Y":
                         for subdomain in response:
