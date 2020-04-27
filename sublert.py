@@ -288,9 +288,10 @@ def compare_files_diff(domain_to_monitor): #compares the temporary text file wit
                         changes = [l for l in diff if l.startswith('+ ')] #check if there are new items/subdomains
                         newdiff = []
                         for c in changes:
-                            c = c.replace('+ ', '')
-                            c = c.replace('*.', '')
-                            c = c.replace('\n', '')
+                            c = c \
+                                .replace('+ ', '') \
+                                .replace('*.', '') \
+                                .replace('\n', '')
                             result.append(c)
                             result = list(set(result)) #remove duplicates
                     except:
@@ -304,8 +305,9 @@ def dns_resolution(new_subdomains): #Perform DNS resolution on retrieved subdoma
     subdomains_to_resolve = new_subdomains
     print(colored("\n[!] Performing DNS resolution. Please do not interrupt!", "red"))
     for domain in subdomains_to_resolve:
-        domain = domain.replace('+ ','')
-        domain = domain.replace('*.','')
+        domain = domain \
+            .replace('+ ','') \
+            .replace('*.','')
         dns_results[domain] = {}
         try:
             for qtype in ['A','CNAME']:
@@ -347,8 +349,9 @@ def posting_to_slack(result, dns_resolve, dns_output): #sending result to slack 
             rev_url = []
             print(colored("\n[!] Exporting result to Slack. Please do not interrupt!", "red"))
             for url in dns_result:
-                url = url.replace('*.', '')
-                url = url.replace('+ ', '')
+                url = url \
+                    .replace('*.', '') \
+                    .replace('+ ', '')
                 rev_url.append(get_fld(url, fix_protocol = True))
 
             unique_list = list(set(new_subdomains) & set(dns_result.keys())) #filters non-resolving subdomains from new_subdomains list
